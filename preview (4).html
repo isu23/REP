@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Right Endpoint Rule</title>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+<script id="MathJax-script" async
+src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f4f7fb;
+}
+
+header{
+    background:linear-gradient(135deg,#003366,#1565c0);
+    color:white;
+    text-align:center;
+    padding:40px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    margin-bottom:25px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+h2{
+    color:#1565c0;
+}
+
+canvas{
+    background:white;
+    border:2px solid #1565c0;
+    border-radius:12px;
+    display:block;
+    margin:auto;
+}
+
+.exercise{
+    background:#fafafa;
+    padding:20px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+.option{
+    display:block;
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    border:2px solid #ddd;
+    cursor:pointer;
+    background:white;
+}
+
+.option:hover{
+    background:#eef5ff;
+}
+
+.correct{
+    background:#d4edda !important;
+    border-color:#28a745 !important;
+}
+
+.wrong{
+    background:#f8d7da !important;
+    border-color:#dc3545 !important;
+}
+
+.answer{
+    display:none;
+    margin-top:15px;
+    background:#eef5ff;
+    padding:15px;
+    border-left:5px solid #1565c0;
+    border-radius:10px;
+}
+
+.tip{
+    margin-top:10px;
+    background:#fff8d9;
+    padding:12px;
+    border-left:5px solid #f4b400;
+    border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>PHƯƠNG PHÁP RIGHT ENDPOINT</h1>
+<p>Tổng Riemann bên phải</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Ý tưởng</h2>
+
+<p>
+Right Endpoint lấy chiều cao hình chữ nhật tại điểm cuối bên phải.
+</p>
+
+<p>
+
+\[
+R_n=\sum_{i=1}^{n} f(x_i)\Delta x
+\]
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>Minh họa trực quan</h2>
+
+<canvas id="graph" width="700" height="400"></canvas>
+
+</div>
+
+<div class="card">
+
+<h2>Bài tập tương tác</h2>
+
+<div id="quiz"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const canvas=document.getElementById("graph");
+const ctx=canvas.getContext("2d");
+
+function draw(){
+
+ctx.clearRect(0,0,700,400);
+
+ctx.strokeStyle="black";
+ctx.beginPath();
+ctx.moveTo(50,350);
+ctx.lineTo(650,350);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(50,350);
+ctx.lineTo(50,50);
+ctx.stroke();
+
+ctx.strokeStyle="#1565c0";
+ctx.lineWidth=3;
+
+ctx.beginPath();
+
+for(let x=0;x<=500;x++){
+
+let realx=x/100;
+let y=realx*realx;
+
+let px=50+x;
+let py=350-y*40;
+
+if(x===0){
+ctx.moveTo(px,py);
+}else{
+ctx.lineTo(px,py);
+}
+
+}
+
+ctx.stroke();
+
+ctx.fillStyle="rgba(21,101,192,0.3)";
+
+let dx=2/4;
+
+for(let i=1;i<=4;i++){
+
+let x=i*dx;
+let h=x*x;
+
+let px=50+(x-dx)*100;
+let width=dx*100;
+let py=350-h*40;
+
+ctx.fillRect(px,py,width,h*40);
+
+}
+
+}
+
+draw();
+
+const questions=[
+
+{
+question:"Right Endpoint lấy chiều cao ở đâu?",
+options:[
+"Điểm trái",
+"Điểm giữa",
+"Điểm phải",
+"Ngẫu nhiên"
+],
+answer:2,
+explanation:"Right Endpoint luôn lấy chiều cao tại điểm cuối bên phải.",
+tip:"Right = phải."
+},
+
+{
+question:"Cho \\(f(x)=x\\), \\([0,2]\\), \\(n=2\\). Tính \\(\\Delta x\\).",
+options:["0.5","1","2","4"],
+answer:1,
+explanation:"\\((2-0)/2=1\\).",
+tip:"Lấy độ dài đoạn chia cho số khoảng."
+},
+
+{
+question:"Cho \\(f(x)=x^2\\), \\([0,2]\\), \\(n=2\\). Tính \\(R_2\\).",
+options:["2","5","6","8"],
+answer:1,
+explanation:"Điểm phải là 1 và 2 nên: \\(1^2+2^2=5\\).",
+tip:"Bình phương điểm phải."
+}
+
+];
+
+const quiz=document.getElementById("quiz");
+
+questions.forEach((q,index)=>{
+
+const div=document.createElement("div");
+div.className="exercise";
+
+div.innerHTML=`<h3>Câu ${index+1}</h3><p>${q.question}</p>`;
+
+q.options.forEach((opt,i)=>{
+
+const btn=document.createElement("button");
+btn.className="option";
+btn.innerHTML=opt;
+
+btn.onclick=()=>{
+
+if(div.dataset.done) return;
+
+div.dataset.done=true;
+
+const buttons=div.querySelectorAll(".option");
+
+buttons.forEach((b,j)=>{
+if(j===q.answer){
+b.classList.add("correct");
+}
+});
+
+if(i!==q.answer){
+btn.classList.add("wrong");
+}
+
+answer.style.display="block";
+
+MathJax.typesetPromise();
+
+};
+
+div.appendChild(btn);
+
+});
+
+const answer=document.createElement("div");
+
+answer.className="answer";
+
+answer.innerHTML=`
+
+<strong>Đáp án đúng:</strong>
+${String.fromCharCode(65+q.answer)}
+
+<br><br>
+
+<strong>Giải thích:</strong>
+${q.explanation}
+
+<div class="tip">
+
+<strong>Mẹo nhanh:</strong>
+${q.tip}
+
+</div>
+
+`;
+
+div.appendChild(answer);
+
+quiz.appendChild(div);
+
+});
+
+</script>
+
+</body>
+</html>
